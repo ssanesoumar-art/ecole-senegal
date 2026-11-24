@@ -1,13 +1,11 @@
-// Petite IA de l'école - Sans clé, sans paiement
+// Petite IA de l'école - Gratuite, sans clé
 export function proposerReponse(question: string, niveau: string): string {
   const q = question.toLowerCase();
-
   if (q.includes("ba + ba") || q.includes("baba")) return "Bravo ! BA + BA ça fait BABA, comme Papa ! Tu as bien compris, c'est 2 fois BA. 👏";
   if (q.includes("écrire") || q.includes("comment on écrit")) return "On écrit lettre par lettre, doucement. Dis-moi le mot et on l'écrit ensemble. ✏️";
   if (q.includes("pourquoi")) return "Très bonne question ! C'est parce que c'est comme ça que ça marche. On va découvrir ensemble. 🌟";
   if (q.includes("calcul") || q.includes("combien") || q.includes("+") || q.includes("-")) return "On compte ensemble avec les doigts. Montre-moi avec tes doigts, on va y arriver ! 🖐️";
   if (q.includes("lire") || q.includes("lecture")) return "On lit doucement : on coupe le mot en syllabes. BA - BA = BABA. Essaie ! 📖";
-
   return `Très bonne question ! En ${niveau}, on apprend ça pas à pas. Tu es sur la bonne voie, continue comme ça ! 👏`;
 }
 
@@ -23,9 +21,11 @@ export function verifierInscription(age: string, niveau: string, sexe: string): 
 
 export function reponseParent(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes("prix") || m.includes("combien") || m.includes("inscription")) return "L'inscription se fait ici sur le site. Remplissez le formulaire, Mme Diop va valider. L'école est à Yeumbeul, Dakar.";
-  if (m.includes("où") || m.includes("adresse") || m.includes("yeumbeul")) return "L'école est à Yeumbeul, Dakar. Venez nous voir le matin.";
-  if (m.includes("horaire") || m.includes("heure")) return "Les cours sont le matin de 8h à 12h.";
-  if (m.includes("bonjour") || m.includes("salut")) return "Bonjour ! Bienvenue à l'école de Yeumbeul. Comment je peux vous aider ? 😊";
-  return "Merci pour votre message ! Mme Diop va vous répondre très vite sur WhatsApp.";
+  if (m.includes("prix") || m.includes("combien") || m.includes("inscription") || m.includes("payer")) return "L'inscription est 100% gratuite ici sur le site ! Remplissez le formulaire Inscription, Mme Diop va valider. L'école est à Yeumbeul, Dakar.";
+  if (m.includes("où") || m.includes("adresse") || m.includes("yeumbeul") || m.includes("keur massar")) return "L'école est à Yeumbeul / Keur Massar, Dakar. Venez nous voir le matin de 8h à 12h.";
+  if (m.includes("horaire") || m.includes("heure") || m.includes("cours")) return "Les cours sont le matin de 8h à 12h, de la Maternelle au CM2.";
+  if (m.includes("niveau") || m.includes("classe") || m.includes("cp") || m.includes("ce1") || m.includes("cm2")) return "Nous avons de la Maternelle au CM2 : Maternelle, CP, CE1, CE2, CM1, CM2. Quel âge a votre enfant ? Je vous dis sa classe.";
+  if (m.includes("bonjour") || m.includes("salut") || m.includes("salam")) return "Bonjour ! Bienvenue à l'école de Yeumbeul 😊 Comment je peux vous aider ? Vous voulez inscrire votre enfant ?";
+  if (m.includes("merci")) return "De rien ! N'hésitez pas si vous avez d'autres questions. Mme Diop est là pour vous. ❤️";
+  return "Merci pour votre message ! Pour inscrire votre enfant, cliquez sur Inscription en haut. Ou écrivez à Mme Diop sur WhatsApp au 77 375 84 73.";
 }

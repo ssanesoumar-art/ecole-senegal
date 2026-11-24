@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AssistantIA from "./components/AssistantIA";
 
 const niveaux = [
   { nom: "Moyenne Section", emoji: "🧒", couleur: "bg-yellow-400", lien: "moyenne-section", desc: "Couleurs, formes, chiffres 1 à 5" },
@@ -157,8 +158,11 @@ export default function Accueil() {
             </div>
           </div>
         </div>
-        <p className="text-center text-xs text-gray-400 mt-6">© 2026 Ecole-Senegal - Keur Massar, Dakar. Tous droits réservés. | WhatsApp : +221 75 837 65 91</p>
+                <p className="text-center text-xs text-gray-400 mt-6">© 2026 Ecole-Senegal - Keur Massar, Dakar. Tous droits réservés. | WhatsApp : +221 75 837 65 91</p>
       </div>
+
+      {/* BOUTON IA EN BAS À DROITE */}
+      <AssistantIA />
     </div>
   );
 }
