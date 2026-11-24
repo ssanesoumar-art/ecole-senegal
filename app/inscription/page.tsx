@@ -25,7 +25,8 @@ export default function InscriptionPage() {
     // LIEN AVEC TOUTES LES INFOS DEDANS
     const lien = `https://ecole-senegal.vercel.app/enseignant/inscriptions?valider=${id}&parent=${encodeURIComponent(parent)}&enfant=${encodeURIComponent(enfant)}&age=${age}&sexe=${encodeURIComponent(sexe)}&niveau=${niveau}&tel=${encodeURIComponent(tel)}`;
     const texte = `Bonjour Mme Diop, nouvelle inscription:%0A- Parent: ${parent}%0A- Enfant: ${enfant}%0A- Âge: ${age} ans%0A- Sexe: ${sexe}%0A- Niveau: ${niveau}%0A- Tél: ${tel}%0A- Message: ${message}%0A%0A👉 CLIQUE ICI POUR VERIFIER ET VALIDER:%0A${lien}%0A%0AAppuie sur OK pour valider.`;
-    window.open(`https://wa.me/221773758473?text=${texte}`, "_blank");
+    // ✅ BON NUMÉRO : 75 837 65 91
+    window.open(`https://wa.me/221758376591?text=${texte}`, "_blank");
     setEnvoye(true);
   };
 
@@ -55,7 +56,7 @@ export default function InscriptionPage() {
             </select>
           </div>
           <select value={niveau} onChange={e => setNiveau(e.target.value)} className="w-full border rounded-xl p-3"><option>CP</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option></select>
-          <input value={tel} onChange={e => setTel(e.target.value)} placeholder="Téléphone WhatsApp - Ex: 76 376 82 40" className="w-full border rounded-xl p-3" />
+          <input value={tel} onChange={e => setTel(e.target.value)} placeholder="Téléphone WhatsApp - Ex: 75 837 65 91" className="w-full border rounded-xl p-3" />
           <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Message pour Mme Diop (optionnel)" rows={2} className="w-full border rounded-xl p-3" />
           <button onClick={envoyer} className="w-full bg-green-600 text-white py-4 rounded-full font-bold">Envoyer sur WhatsApp →</button>
         </div>
