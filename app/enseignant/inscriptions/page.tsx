@@ -8,6 +8,8 @@ export default function InscriptionsPage() {
   const [liste, setListe] = useState<Ins[]>([]);
   const [monte, setMonte] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [aVerifier, setAVerifier] = useState<Ins | null>(null);
+
   const [parent, setParent] = useState("");
   const [enfant, setEnfant] = useState("");
   const [age, setAge] = useState("");
@@ -33,8 +35,17 @@ export default function InscriptionsPage() {
     setParent(""); setEnfant(""); setAge(""); setTel(""); setShowForm(false);
   };
 
-  const valider = (id: number) => setListe(liste.map(i => i.id === id ? { ...i, statut: "Validé ✅" } : i));
-  const refuser = (id: number) => { if (confirm("Refuser ?")) setListe(liste.filter(i => i.id !== id)); };
+  const valider = (id: number) => {
+    setListe(liste.map(i => i.id === id ? { ...i, statut: "Validé ✅" } : i));
+    setAVerifier(null);
+    alert("✅ Inscription validée ! L'enfant est maintenant élève officiel.");
+  };
+
+  const refuser = (id: number) => {
+    if (!confirm("Refuser cette inscription ?")) return;
+    setListe(liste.filter(i => i.id !== id));
+    setAVerifier(null);
+  };
 
   return (
     <div className="min-h-screen bg-[#f8f7f4] p-6">
@@ -62,19 +73,51 @@ export default function InscriptionsPage() {
         )}
 
         <div className="space-y-3 mt-6">
+          {liste.length === 0 && <p className="text-center text-gray-500 bg-white p-8 rounded-2xl">Aucune inscription.<br/>Ajoute celle de Lamine seck avec le bouton vert en haut.</p>}
           {liste.map((ins) => (
             <div key={ins.id} className={`bg-white rounded-2xl p-5 border-2 ${ins.statut.includes("Validé") ? "border-green-300" : "border-orange-200"}`}>
               <p className="font-bold">{ins.sexe === "Fille" ? "👧" : "👦"} {ins.enfant} <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">{ins.niveau}</span> <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{ins.age} ans • {ins.sexe}</span></p>
-              <p className="text-sm text-gray-600 mt-1">Parent : {ins.parent} • 📞 {ins.tel} • {ins.date}</p>
-              <p className="text-xs text-gray-400">{ins.message}</p>
-              <div className="flex justify-between items-center mt-3">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${ins.statut.includes("Validé") ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>{ins.statut}</span>
-                {ins.statut === "En attente" && <div className="flex gap-2"><button onClick={() => valider(ins.id)} className="bg-green-600 text-white px-4 py-2 rounded-full font-bold text-sm">✅ Valider</button><button onClick={() => refuser(ins.id)} className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-bold text-sm">Refuser</button></div>}
+              <p className="text-sm text-gray-600 mt-1">Parent : {ins.parent} • 📞 {ins.tel}</p>
+              <div className="flex gap-2 mt-3">
+                <span className={`text-xs font-bold px-3 py-1 rounded-full self-center ${ins.statut.includes("Validé") ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>{ins.statut}</span>
+                {/* LES 2 OPTIONS */}
+                <button onClick={() => setAVerifier(ins)} className="flex-1 bg-blue-100 text-blue-700 py-2 rounded-full font-bold text-sm">👁️ 1. Vérifier les infos</button>
+                {ins.statut === "En attente" && <button onClick={() => valider(ins.id)} className="flex-1 bg-green-600 text-white py-2 rounded-full font-bold text-sm">✅ 2. Valider</button>}
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* FENETRE VERIFIER */}
+      {aVerifier && (
+        <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setAVerifier(null)}>
+          <div className="bg-white w-full max-w-md rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center"><p className="font-bold">🔍 Vérifier les informations</p><button onClick={() => setAVerifier(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
+            <div className="text-center mt-4"><p className="text-6xl">{aVerifier.sexe === "Fille" ? "👧" : "👦"}</p><p className="font-bold text-lg mt-2">{aVerifier.enfant}</p><p className="text-sm text-gray-500">{aVerifier.niveau} • {aVerifier.age} ans • {aVerifier.sexe}</p></div>
+            <div className="space-y-2 mt-5 text-sm bg-gray-50 p-4 rounded-2xl">
+              <p><b>👨‍👩‍👦 Parent :</b> {aVerifier.parent}</p>
+              <p><b>📞 Téléphone :</b> {aVerifier.tel}</p>
+              <p><b>🎂 Âge :</b> {aVerifier.age} ans</p>
+              <p><b>👦 / 👧 Sexe :</b> {aVerifier.sexe}</p>
+              <p><b>📚 Niveau demandé :</b> {aVerifier.niveau}</p>
+              <p><b>📅 Date :</b> {aVerifier.date}</p>
+              <p><b>💬 Message :</b> {aVerifier.message}</p>
+              <p><b>📌 Statut :</b> {aVerifier.statut}</p>
+            </div>
+            <p className="text-xs text-gray-500 text-center mt-3">Vérifie bien : Âge = bon pour le niveau ? Nom correct ? Téléphone correct ?</p>
+            {aVerifier.statut === "En attente" ? (
+              <>
+                <button onClick={() => valider(aVerifier.id)} className="w-full bg-green-600 text-white py-3 rounded-full mt-4 font-bold">✅ Tout est bon - Valider l&apos;inscription</button>
+                <button onClick={() => refuser(aVerifier.id)} className="w-full bg-red-100 text-red-600 py-3 rounded-full mt-2 font-bold text-sm">🗑️ Refuser - Infos incorrectes</button>
+              </>
+            ) : (
+              <p className="text-center bg-green-50 text-green-700 font-bold p-3 rounded-xl mt-4">✅ Déjà validé</p>
+            )}
+            <button onClick={() => setAVerifier(null)} className="w-full bg-gray-100 py-3 rounded-full mt-2 font-bold text-sm">Fermer</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
