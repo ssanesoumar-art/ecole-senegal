@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Doc = { nom: string; type: string; taille: string; url: string; date: string };
 
@@ -10,11 +10,11 @@ const defaut: Doc[] = [
 ];
 
 export default function DocumentsPage() {
-  const [docs, setDocs] = useState<Doc[]>(defaut);
-  useEffect(() => {
+  const [docs] = useState<Doc[]>(() => {
+    if (typeof window === "undefined") return defaut;
     const saved = localStorage.getItem("ecole-docs");
-    if (saved) setDocs(JSON.parse(saved));
-  }, []);
+    return saved ? JSON.parse(saved) : defaut;
+  });
 
   return (
     <div className="min-h-screen bg-[#f8f7f4] p-6">

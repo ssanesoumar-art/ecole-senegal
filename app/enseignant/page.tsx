@@ -13,62 +13,63 @@ const elevesInit = [
 type Doc = { nom: string; type: string; taille: string; url: string; date: string };
 type Q = { id: number; auteur: string; role: string; question: string; reponse: string | null; likes: number; date: string };
 
+const questionsDefaut: Q[] = [
+  { id: 1, auteur: "Moussa", role: "CP", question: "Madame, pourquoi BA + BA = BABA ?", reponse: "Bravo Moussa ! Parce que BA + BA ça fait 2 fois BA, donc BABA comme Papa ! 👏", likes: 3, date: "Aujourd'hui" },
+  { id: 2, auteur: "Awa", role: "CP", question: "Comment on écrit 15 ?", reponse: "Quinze", likes: 1, date: "Aujourd'hui" },
+  { id: 3, auteur: "Moussa", role: "CP", question: "J’ai compris", reponse: null, likes: 0, date: "Aujourd'hui" },
+];
+
+const docsDefaut: Doc[] = [
+  { nom: "Exercice Maths CP.pdf", type: "PDF", taille: "1.2 Mo", url: "#", date: "Aujourd'hui" },
+  { nom: "Lecture - Les voyelles.pdf", type: "PDF", taille: "800 Ko", url: "#", date: "Hier" },
+];
+
 export default function EnseignantPage() {
   const [eleves] = useState(elevesInit);
   const [titre, setTitre] = useState("");
   const [message, setMessage] = useState("");
-  const [docs, setDocs] = useState<Doc[]>([
-    { nom: "Exercice Maths CP.pdf", type: "PDF", taille: "1.2 Mo", url: "#", date: "Aujourd'hui" },
-    { nom: "Lecture - Les voyelles.pdf", type: "PDF", taille: "800 Ko", url: "#", date: "Hier" },
-  ]);
+  const [docs, setDocs] = useState<Doc[]>(() => {
+    if (typeof window === "undefined") return docsDefaut;
+    const d = localStorage.getItem("ecole-docs");
+    return d ? JSON.parse(d) : docsDefaut;
+  });
 
-  const [questions, setQuestions] = useState<Q[]>([]);
+  const [questions, setQuestions] = useState<Q[]>(() => {
+    if (typeof window === "undefined") return questionsDefaut;
+    const s = localStorage.getItem("ecole-questions");
+    return s ? JSON.parse(s) : questionsDefaut;
+  });
   const [ouverte, setOuverte] = useState<Q | null>(null);
   const [docOuvert, setDocOuvert] = useState<Doc | null>(null);
   const [reponseTxt, setReponseTxt] = useState("");
 
   useEffect(() => {
-    const s = localStorage.getItem("ecole-questions");
-    if (s) setQuestions(JSON.parse(s));
-    else setQuestions([
-      { id: 1, auteur: "Moussa", role: "CP", question: "Madame, pourquoi BA + BA = BABA ?", reponse: "Bravo Moussa ! Parce que BA + BA ça fait 2 fois BA, donc BABA comme Papa ! 👏", likes: 3, date: "Aujourd'hui" },
-      { id: 2, auteur: "Awa", role: "CP", question: "Comment on écrit 15 ?", reponse: "Quinze", likes: 1, date: "Aujourd'hui" },
-      { id: 3, auteur: "Moussa", role: "CP", question: "J'ai compris", reponse: null, likes: 0, date: "Aujourd'hui" },
-    ]);
-    const d = localStorage.getItem("ecole-docs");
-    if (d) setDocs(JSON.parse(d));
-  }, []);
-
-  useEffect(() => {
     if (questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
-    if (ouverte) {
-      const maj = questions.find(q => q.id === ouverte.id);
-      if (maj) setOuverte(maj);
-    }
   }, [questions]);
+
+  // Question ouverte toujours à jour, sans setState dans useEffect
+  const ouverteMaj = ouverte ? questions.find(q => q.id === ouverte.id) || ouverte : null;
 
   const ouvrirSession = (q: Q) => { setOuverte(q); setReponseTxt(q.reponse || ""); };
   const repondreDansSession = () => {
-    if (!reponseTxt.trim() || !ouverte) return;
-    setQuestions(questions.map(q => q.id === ouverte.id ? { ...q, reponse: reponseTxt } : q));
+    if (!reponseTxt.trim() || !ouverteMaj) return;
+    setQuestions(questions.map(q => q.id === ouverteMaj.id ? { ...q, reponse: reponseTxt } : q));
     alert("✅ Réponse envoyée !");
     setOuverte(null);
   };
 
-  // ===== SUPPRIMER UNE FAUSSE REPONSE =====
   const supprimerReponse = () => {
-    if (!ouverte) return;
-    if (!confirm("Supprimer cette réponse ? L'élève verra à nouveau 'En attente...'")) return;
-    setQuestions(questions.map(q => q.id === ouverte.id ? { ...q, reponse: null } : q));
+    if (!ouverteMaj) return;
+    if (!confirm("Supprimer cette réponse ? L’élève verra à nouveau 'En attente...'")) return;
+    setQuestions(questions.map(q => q.id === ouverteMaj.id ? { ...q, reponse: null } : q));
     setOuverte(null);
     alert("🗑️ Réponse supprimée ! Tu peux écrire une nouvelle réponse.");
   };
 
-  // ===== SUPPRIMER UNE FAUSSE QUESTION =====
   const supprimerQuestion = () => {
-    if (!ouverte) return;
+    if (!ouverteMaj) return;
     if (!confirm("Supprimer toute la question ?")) return;
-    setQuestions(questions.filter(q => q.id !== ouverte.id));
+    setQuestions(questions.filter(q => q.id !== ouverteMaj.id));
     setOuverte(null);
   };
 
@@ -109,6 +110,8 @@ export default function EnseignantPage() {
           </div>
         </div>
 
+        <Link href="/enseignant/inscriptions" className="block bg-orange-500 text-white text-center py-4 rounded-2xl mt-4 font-bold">📝 Voir le Tableau des Inscriptions →</Link>
+
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="bg-white rounded-2xl p-6">
             <h2 className="font-bold text-lg">👦🏾 Mes élèves</h2>
@@ -122,7 +125,6 @@ export default function EnseignantPage() {
               ))}
             </div>
 
-            {/* ===== DOCUMENTS - CLIQUE POUR OUVRIR SESSION ===== */}
             <h2 className="font-bold text-lg mt-8">📁 Documents partagés - Clique pour ouvrir</h2>
             <div className="space-y-3 mt-3">
               {docs.map((d) => (
@@ -150,7 +152,6 @@ export default function EnseignantPage() {
           </div>
         </div>
 
-        {/* QUESTIONS */}
         <div className="bg-white rounded-2xl p-6 mt-6">
           <h2 className="font-bold text-lg">💬 Questions des élèves - Clique pour ouvrir</h2>
           <div className="space-y-3 mt-4">
@@ -175,19 +176,18 @@ export default function EnseignantPage() {
         </div>
       </div>
 
-      {/* ===== SESSION QUESTION / REPONSE ===== */}
-      {ouverte && (
+      {ouverteMaj && (
         <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setOuverte(null)}>
           <div className="bg-white w-full max-w-lg rounded-3xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center"><p className="font-bold">💬 Session - {ouverte.auteur}</p><button onClick={() => setOuverte(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
-            <div className="bg-blue-50 rounded-2xl p-4 mt-4"><p className="text-xs font-bold text-blue-700">👦 {ouverte.auteur} • {ouverte.date} • ❤️ {ouverte.likes}</p><p className="font-medium mt-1">{ouverte.question}</p></div>
-            {ouverte.reponse && (
+            <div className="flex justify-between items-center"><p className="font-bold">💬 Session - {ouverteMaj.auteur}</p><button onClick={() => setOuverte(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
+            <div className="bg-blue-50 rounded-2xl p-4 mt-4"><p className="text-xs font-bold text-blue-700">👦 {ouverteMaj.auteur} • {ouverteMaj.date} • ❤️ {ouverteMaj.likes}</p><p className="font-medium mt-1">{ouverteMaj.question}</p></div>
+            {ouverteMaj.reponse && (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mt-3">
-                <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse actuelle :</p><p className="mt-1">{ouverte.reponse}</p>
+                <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse actuelle :</p><p className="mt-1">{ouverteMaj.reponse}</p>
                 <button onClick={supprimerReponse} className="w-full bg-red-100 text-red-700 py-2 rounded-full mt-3 text-sm font-bold">🗑️ Supprimer cette fausse réponse</button>
               </div>
             )}
-            <div className="mt-4"><p className="font-bold text-sm">{ouverte.reponse ? "Corriger la réponse :" : "Écrire ta réponse :"}</p>
+            <div className="mt-4"><p className="font-bold text-sm">{ouverteMaj.reponse ? "Corriger la réponse :" : "Écrire ta réponse :"}</p>
               <textarea value={reponseTxt} onChange={e => setReponseTxt(e.target.value)} rows={3} className="w-full border rounded-xl p-3 mt-2 outline-none" />
               <button onClick={repondreDansSession} className="w-full bg-purple-700 text-white py-3 rounded-full mt-2 font-bold">Envoyer la réponse ✅</button>
             </div>
@@ -197,7 +197,6 @@ export default function EnseignantPage() {
         </div>
       )}
 
-      {/* ===== SESSION DOCUMENT ===== */}
       {docOuvert && (
         <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setDocOuvert(null)}>
           <div className="bg-white w-full max-w-lg rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>

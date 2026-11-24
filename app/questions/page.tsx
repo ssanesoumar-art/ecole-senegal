@@ -7,7 +7,7 @@ type Q = { id: number; auteur: string; role: string; question: string; reponse: 
 const initial: Q[] = [
   { id: 1, auteur: "Moussa", role: "CP", question: "Madame, pourquoi BA + BA = BABA ?", reponse: "Bravo Moussa ! Parce que BA + BA ça fait 2 fois BA, donc BABA comme Papa ! 👏", likes: 3, date: "Aujourd'hui" },
   { id: 2, auteur: "Awa", role: "CP", question: "Comment on écrit 15 ?", reponse: "Quinze", likes: 1, date: "Aujourd'hui" },
-  { id: 3, auteur: "Moussa", role: "CP", question: "J'ai compris", reponse: null, likes: 0, date: "Aujourd'hui" },
+  { id: 3, auteur: "Moussa", role: "CP", question: "J’ai compris", reponse: null, likes: 0, date: "Aujourd'hui" },
 ];
 
 export default function QuestionsPage() {
@@ -17,25 +17,24 @@ export default function QuestionsPage() {
   const [modeProf, setModeProf] = useState(false);
   const [ouverte, setOuverte] = useState<Q | null>(null);
   const [reponseTxt, setReponseTxt] = useState("");
+  const [monte, setMonte] = useState(false);
 
-  const charger = () => {
-    const s = localStorage.getItem("ecole-questions");
-    if (s) setQuestions(JSON.parse(s));
-  };
-
+  // 1. On charge localStorage SEULEMENT après que la page est affichée
   useEffect(() => {
-    charger();
-    const interval = setInterval(charger, 2000);
-    return () => clearInterval(interval);
+    setMonte(true);
+    const s = localStorage.getItem("ecole-questions");
+    if (s) {
+      try { setQuestions(JSON.parse(s)); } catch {}
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
+  // 2. On sauvegarde quand ça change, mais pas au premier affichage
   useEffect(() => {
-    if (questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
-    if (ouverte) {
-      const maj = questions.find(q => q.id === ouverte.id);
-      if (maj) setOuverte(maj);
-    }
-  }, [questions]);
+    if (monte && questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
+  }, [questions, monte]);
+
+  const ouverteMaj = ouverte ? questions.find(q => q.id === ouverte.id) || ouverte : null;
 
   const poser = () => {
     if (!texte.trim()) return;
@@ -54,10 +53,8 @@ export default function QuestionsPage() {
 
   const liker = (id: number) => setQuestions(questions.map(q => q.id === id ? { ...q, likes: q.likes + 1 } : q));
 
-  // ✅ NOUVEAU : SUPPRIMER UNE QUESTION
   const supprimerQuestion = () => {
     if (!ouverte) return;
-    // Sécurité : seul l'auteur ou le prof peut supprimer
     if (!modeProf && ouverte.auteur !== nom) {
       alert("Tu ne peux supprimer que TES questions !");
       return;
@@ -84,7 +81,7 @@ export default function QuestionsPage() {
           <button onClick={poser} className="w-full bg-green-600 text-white py-3 rounded-full mt-3 font-bold text-sm">Poser ma question →</button>
         </div>
 
-        <h2 className="font-bold mt-6">Toutes les questions ({questions.length})</h2>
+        <h2 className="font-bold mt-6" suppressHydrationWarning>Toutes les questions ({monte ? questions.length : initial.length})</h2>
         <div className="space-y-3 mt-3">
           {questions.map(q => (
             <button key={q.id} onClick={() => setOuverte(q)} className="w-full text-left bg-white rounded-2xl p-5 hover:shadow-lg border">
@@ -100,54 +97,47 @@ export default function QuestionsPage() {
         </div>
       </div>
 
-      {ouverte && (
+      {ouverteMaj && (
         <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setOuverte(null)}>
           <div className="bg-white w-full max-w-lg rounded-3xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center">
-              <p className="font-bold">💬 Session - Question de {ouverte.auteur}</p>
+              <p className="font-bold">💬 Session - Question de {ouverteMaj.auteur}</p>
               <button onClick={() => setOuverte(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button>
             </div>
-
             <div className="bg-blue-50 rounded-2xl p-4 mt-4">
-              <p className="text-xs font-bold text-blue-700">👦 {ouverte.auteur} • {ouverte.date}</p>
-              <p className="font-medium mt-1">{ouverte.question}</p>
-              <button onClick={() => liker(ouverte.id)} className="text-sm mt-2">❤️ {ouverte.likes} J'ai la même question</button>
+              <p className="text-xs font-bold text-blue-700">👦 {ouverteMaj.auteur} • {ouverteMaj.date}</p>
+              <p className="font-medium mt-1">{ouverteMaj.question}</p>
+              <button onClick={() => liker(ouverteMaj.id)} className="text-sm mt-2">❤️ {ouverteMaj.likes} J’ai la même question</button>
             </div>
-
-            {ouverte.reponse ? (
+            {ouverteMaj.reponse ? (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mt-3">
                 <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Mme Diop - Réponse :</p>
-                <p className="mt-1">{ouverte.reponse}</p>
+                <p className="mt-1">{ouverteMaj.reponse}</p>
               </div>
             ) : (
               <p className="text-sm text-orange-600 bg-orange-50 p-3 rounded-xl mt-3">⏳ Pas encore de réponse. Le prof va répondre bientôt.</p>
             )}
-
             {modeProf && (
               <div className="mt-4">
-                <p className="font-bold text-sm">Répondre à {ouverte.auteur} :</p>
+                <p className="font-bold text-sm">Répondre à {ouverteMaj.auteur} :</p>
                 <textarea value={reponseTxt} onChange={e => setReponseTxt(e.target.value)} placeholder="Écris ta réponse ici..." rows={3} className="w-full border rounded-xl p-3 mt-2 outline-none" />
                 <button onClick={repondre} className="w-full bg-purple-700 text-white py-3 rounded-full mt-2 font-bold">Envoyer la réponse ✅</button>
               </div>
             )}
-
             {!modeProf && (
               <div className="mt-4 border-t pt-4">
-                <p className="text-sm font-bold">Tu n'as pas compris ? Pose une autre question :</p>
+                <p className="text-sm font-bold">Tu n’as pas compris ? Pose une autre question :</p>
                 <div className="flex gap-2 mt-2">
-                  <input value={texte} onChange={e => setTexte(e.target.value)} placeholder="Ex: Je n'ai pas compris..." className="border rounded-xl p-2 flex-1 text-sm" />
+                  <input value={texte} onChange={e => setTexte(e.target.value)} placeholder="Ex: Je n’ai pas compris..." className="border rounded-xl p-2 flex-1 text-sm" />
                   <button onClick={() => { poser(); }} className="bg-green-600 text-white px-4 rounded-full text-sm font-bold">Envoyer</button>
                 </div>
               </div>
             )}
-
-            {/* ✅ BOUTON SUPPRIMER - ICI DANS LA SESSION */}
-            {(modeProf || ouverte.auteur === nom) && (
+            {(modeProf || ouverteMaj.auteur === nom) && (
               <button onClick={supprimerQuestion} className="w-full bg-red-100 text-red-600 py-3 rounded-full mt-4 text-sm font-bold">
                 🗑️ {modeProf ? "Supprimer cette question (Prof)" : "Supprimer ma question"}
               </button>
             )}
-
             <button onClick={() => setOuverte(null)} className="w-full bg-gray-100 py-3 rounded-full mt-3 text-sm font-bold">Fermer la session</button>
           </div>
         </div>

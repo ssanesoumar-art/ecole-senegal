@@ -16,36 +16,27 @@ export default function Inscription() {
       alert("Remplis : ton nom, nom de l'enfant et téléphone !");
       return;
     }
+
+    // 1. ENREGISTRER dans le tableau
+    const nouvelle = {
+      parent: nomParent,
+      enfant: nomEnfant,
+      niveau: niveau,
+      telephone: telephone,
+      message: message,
+      date: new Date().toLocaleString("fr-SN"),
+    };
+    const anciennes = JSON.parse(localStorage.getItem("ecole-inscriptions") || "[]");
+    anciennes.push(nouvelle);
+    localStorage.setItem("ecole-inscriptions", JSON.stringify(anciennes));
+
+    // 2. Envoyer aussi sur WhatsApp
     const texte = encodeURIComponent(`📝 NOUVELLE INSCRIPTION - Ecole-Senegal\n\n👤 Parent : ${nomParent}\n👧 Enfant : ${nomEnfant}\n📚 Niveau : ${niveau}\n📞 Tél parent : ${telephone}\n💬 Message : ${message || "Aucun"}\n\nMerci !`);
     window.open(`https://wa.me/221758376591?text=${texte}`, "_blank");
-    const envoyer = () => {
-  if (!nomParent.trim() || !nomEnfant.trim() || !telephone.trim()) {
-    alert("Remplis : ton nom, nom de l'enfant et téléphone !");
-    return;
-  }
-
-  // 1. ENREGISTRER dans le tableau
-  const nouvelle = {
-    parent: nomParent,
-    enfant: nomEnfant,
-    niveau: niveau,
-    telephone: telephone,
-    message: message,
-    date: new Date().toLocaleString("fr-SN"),
-  };
-  const anciennes = JSON.parse(localStorage.getItem("ecole-inscriptions") || "[]");
-  anciennes.push(nouvelle);
-  localStorage.setItem("ecole-inscriptions", JSON.stringify(anciennes));
-
-  // 2. Envoyer aussi sur WhatsApp comme avant
-  const texte = encodeURIComponent(`📝 NOUVELLE INSCRIPTION - Ecole-Senegal\n\n👤 Parent : ${nomParent}\n👧 Enfant : ${nomEnfant}\n📚 Niveau : ${niveau}\n📞 Tél parent : ${telephone}\n💬 Message : ${message || "Aucun"}`);
-  window.open(`https://wa.me/221758376591?text=${texte}`, "_blank");
-};
   };
 
   return (
     <div className="min-h-screen bg-[#f8f7f4]">
-      {/* HEADER simple */}
       <header className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
