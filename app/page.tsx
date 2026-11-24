@@ -25,7 +25,6 @@ export default function Accueil() {
       alert("Écris ton nom et ton message !");
       return;
     }
-    // Ouvre WhatsApp avec le message
     const texte = encodeURIComponent(`Bonjour Ecole-Senegal, je suis ${nomContact}. ${msgContact}`);
     window.open(`https://wa.me/221758376591?text=${texte}`, "_blank");
     setNomContact("");
@@ -64,10 +63,7 @@ export default function Accueil() {
         <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">🇸🇳 Keur Massar • Dakar • 100% Gratuit</span>
         <h1 className="text-4xl md:text-5xl font-bold mt-4">Apprendre en s'amusant,<br/>de la <span className="text-green-600">Maternelle</span> au <span className="text-purple-600">CM2</span></h1>
         <p className="text-gray-500 mt-3">Leçons, jeux, exercices et questions-réponses avec Mme Diop.</p>
-        
-        {/* PHOTO ECOLE */}
         <img src="/ecole-senegal.jpeg" alt="Ecole-Senegal Keur Massar" className="w-full max-w-3xl mx-auto rounded-3xl shadow-lg mt-6 object-cover" />
-
         <div className="flex flex-wrap justify-center gap-3 mt-6">
           <Link href="/connexion" className="bg-green-600 text-white px-6 py-3 rounded-full font-bold text-sm">Commencer →</Link>
           <Link href="/questions" className="bg-white border px-6 py-3 rounded-full font-bold text-sm">💬 Voir les questions</Link>
@@ -93,7 +89,6 @@ export default function Accueil() {
             </Link>
           ))}
         </div>
-
         <div className="grid grid-cols-2 gap-4 mt-4">
           <Link href="/questions" className="bg-white rounded-2xl p-5 text-center border">
             <p className="text-4xl">💬</p>
@@ -110,7 +105,7 @@ export default function Accueil() {
         </div>
       </div>
 
-      {/* ===== À PROPOS ===== */}
+      {/* À PROPOS */}
       <div id="apropos" className="max-w-6xl mx-auto px-4 pb-10">
         <div className="bg-white rounded-3xl p-6 md:p-8">
           <p className="text-green-600 font-bold text-sm">🏫 À PROPOS</p>
@@ -122,42 +117,28 @@ export default function Accueil() {
             en s'amusant, avec des leçons simples, des jeux et des exercices adaptés.
           </p>
           <div className="grid grid-cols-3 gap-3 mt-6 text-center">
-            <div className="bg-green-50 rounded-2xl p-4">
-              <p className="text-2xl">📚</p>
-              <p className="font-bold text-sm mt-1">Leçons faciles</p>
-              <p className="text-xs text-gray-500">Français, Maths, Sciences</p>
-            </div>
-            <div className="bg-purple-50 rounded-2xl p-4">
-              <p className="text-2xl">🎮</p>
-              <p className="font-bold text-sm mt-1">Jeux & Quiz</p>
-              <p className="text-xs text-gray-500">Apprendre en jouant</p>
-            </div>
-            <div className="bg-orange-50 rounded-2xl p-4">
-              <p className="text-2xl">👩🏾‍🏫</p>
-              <p className="font-bold text-sm mt-1">Avec Mme Diop</p>
-              <p className="text-xs text-gray-500">Pose tes questions</p>
-            </div>
+            <div className="bg-green-50 rounded-2xl p-4"><p className="text-2xl">📚</p><p className="font-bold text-sm mt-1">Leçons faciles</p><p className="text-xs text-gray-500">Français, Maths, Sciences</p></div>
+            <div className="bg-purple-50 rounded-2xl p-4"><p className="text-2xl">🎮</p><p className="font-bold text-sm mt-1">Jeux & Quiz</p><p className="text-xs text-gray-500">Apprendre en jouant</p></div>
+            <div className="bg-orange-50 rounded-2xl p-4"><p className="text-2xl">👩🏾‍🏫</p><p className="font-bold text-sm mt-1">Avec Mme Diop</p><p className="text-xs text-gray-500">Pose tes questions</p></div>
           </div>
           <p className="text-sm text-gray-500 mt-4">📍 Située à Keur Massar, Dakar - Sénégal. Ouverte à tous les enfants, partout au Sénégal.</p>
           <p className="text-sm font-bold mt-1">📞 +221 75 837 65 91</p>
         </div>
       </div>
 
-      {/* ===== CONTACT ===== */}
+      {/* CONTACT */}
       <div id="contact" className="max-w-6xl mx-auto px-4 pb-16">
         <div className="bg-green-600 text-white rounded-3xl p-6 md:p-8">
           <p className="font-bold text-sm opacity-80">📞 CONTACT</p>
           <h2 className="font-bold text-2xl mt-2">Une question ? Écris-nous !</h2>
           <p className="text-sm opacity-80 mt-2">Parents, élèves, enseignants : on vous répond très vite.</p>
-
           <div className="grid md:grid-cols-2 gap-6 mt-6">
             <div className="space-y-3 text-sm">
               <p className="bg-white/10 rounded-2xl p-4">📍 <b>Adresse :</b><br/>Keur Massar, Dakar, Sénégal</p>
               <p className="bg-white/10 rounded-2xl p-4">📞 <b>Téléphone / WhatsApp :</b><br/>+221 75 837 65 91<br/><a href="https://wa.me/221758376591" target="_blank" className="bg-white text-green-700 px-4 py-2 rounded-full inline-block mt-2 font-bold text-xs">💬 Écrire sur WhatsApp →</a></p>
               <p className="bg-white/10 rounded-2xl p-4">✉️ <b>Email :</b><br/>contact@ecole-senegal.sn</p>
-              <p className="bg-white/10 rounded-2xl p-4">🕐 <b>Horaires :</b><br/>Lun - Sam : 8h - 18h</p>
+              <p className="bg-white/10 rounded-2xl p-4">🕐 <b>Horaires :</b><br/>Lundi au Vendredi : 08h - 17h <span className="opacity-80">(avec des pauses)</span><br/>Samedi : 09h - 13h <span className="opacity-80">(avec une pause)</span></p>
             </div>
-
             <div className="bg-white rounded-2xl p-5 text-black">
               <p className="font-bold">Envoyer un message</p>
               <p className="text-xs text-gray-500">Ton message partira directement sur notre WhatsApp.</p>
@@ -167,7 +148,6 @@ export default function Accueil() {
             </div>
           </div>
         </div>
-
         <p className="text-center text-xs text-gray-400 mt-6">© 2026 Ecole-Senegal - Keur Massar, Dakar. Tous droits réservés. | WhatsApp : +221 75 837 65 91</p>
       </div>
     </div>
