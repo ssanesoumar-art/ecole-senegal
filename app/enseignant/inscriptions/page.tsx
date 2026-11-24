@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { verifierInscription } from "../../lib/ia";
 
 type Ins = { id: number; parent: string; enfant: string; age: string; sexe: string; niveau: string; tel: string; message: string; date: string; statut: string };
 
@@ -36,7 +37,6 @@ function Contenu() {
     if (!idParam) return;
     const trouve = liste.find(i => i.id === Number(idParam));
     if (trouve) { setAVerifier(trouve); return; }
-    // Si pas trouvé (parent sur un autre téléphone), on crée avec les infos du lien
     const p = params.get("parent"); const e = params.get("enfant");
     if (p && e) {
       const nouvelle: Ins = { id: Number(idParam), parent: p, enfant: e, age: params.get("age") || "?", sexe: params.get("sexe") || "Garçon", niveau: params.get("niveau") || "CP", tel: params.get("tel") || "", message: "Via WhatsApp - Lien", date: "Aujourd'hui", statut: "En attente" };
@@ -85,6 +85,8 @@ function Contenu() {
             <div key={ins.id} className={`bg-white rounded-2xl p-5 border-2 ${ins.statut.includes("Validé") ? "border-green-300" : "border-orange-200"}`}>
               <p className="font-bold">{ins.sexe === "Fille" ? "👧" : "👦"} {ins.enfant} <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">{ins.niveau}</span> <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{ins.age} ans • {ins.sexe}</span></p>
               <p className="text-sm text-gray-600 mt-1">Parent : {ins.parent} • 📞 {ins.tel}</p>
+              {/* PETIT AVIS IA DIRECTEMENT DANS LA LISTE */}
+              <p className="text-xs mt-2 bg-purple-50 p-2 rounded-lg">🤖 IA : {verifierInscription(ins.age, ins.niveau, ins.sexe)}</p>
               <div className="flex gap-2 mt-3">
                 <span className={`text-xs font-bold px-3 py-1 rounded-full self-center ${ins.statut.includes("Validé") ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>{ins.statut}</span>
                 <button onClick={() => setAVerifier(ins)} className="flex-1 bg-blue-100 text-blue-700 py-2 rounded-full font-bold text-sm">👁️ Vérifier</button>
@@ -108,6 +110,10 @@ function Contenu() {
               <p><b>Niveau :</b> {aVerifier.niveau}</p>
               <p><b>Message :</b> {aVerifier.message}</p>
             </div>
+            {/* ICI C'EST LA LIGNE IA DONT TU PARLES */}
+            <p className="bg-purple-50 p-3 rounded-xl mt-3 text-sm font-bold">
+              🤖 IA : {verifierInscription(aVerifier.age, aVerifier.niveau, aVerifier.sexe)}
+            </p>
             {aVerifier.statut === "En attente" ? (
               <>
                 <button onClick={() => valider(aVerifier.id)} className="w-full bg-green-600 text-white py-4 rounded-full mt-4 font-bold text-lg">✅ OK - Valider l&apos;inscription</button>

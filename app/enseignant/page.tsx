@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { proposerReponse } from "../lib/ia";
 
 const elevesInit = [
   { nom: "Moussa Diallo", niveau: "CP", points: 120, progression: 65, derniere: "Aujourd'hui" },
@@ -35,7 +36,6 @@ export default function EnseignantPage() {
   const [reponseTxt, setReponseTxt] = useState("");
   const [monte, setMonte] = useState(false);
 
-  // 1. Charger APRES affichage, comme le serveur
   useEffect(() => {
     setMonte(true);
     try {
@@ -47,13 +47,11 @@ export default function EnseignantPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
-  // 2. Sauvegarder seulement après le chargement
   useEffect(() => {
     if (monte && questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
   }, [questions, monte]);
 
   const ouverteMaj = ouverte ? questions.find(q => q.id === ouverte.id) || ouverte : null;
-
   const ouvrirSession = (q: Q) => { setOuverte(q); setReponseTxt(q.reponse || ""); };
   const repondreDansSession = () => {
     if (!reponseTxt.trim() || !ouverteMaj) return;
@@ -61,23 +59,19 @@ export default function EnseignantPage() {
     alert("✅ Réponse envoyée !");
     setOuverte(null);
   };
-
   const supprimerReponse = () => {
     if (!ouverteMaj) return;
     if (!confirm("Supprimer cette réponse ?")) return;
     setQuestions(questions.map(q => q.id === ouverteMaj.id ? { ...q, reponse: null } : q));
     setOuverte(null);
   };
-
   const supprimerQuestion = () => {
     if (!ouverteMaj) return;
     if (!confirm("Supprimer toute la question ?")) return;
     setQuestions(questions.filter(q => q.id !== ouverteMaj.id));
     setOuverte(null);
   };
-
   const creerLecon = () => { if (!titre) return; setMessage(`✅ Leçon "${titre}" créée !`); setTitre(""); };
-
   const ajouterDoc = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -89,7 +83,6 @@ export default function EnseignantPage() {
     setDocs(maj); localStorage.setItem("ecole-docs", JSON.stringify(maj));
     setMessage(`✅ Document "${file.name}" partagé !`);
   };
-
   const supprimerDoc = (nom: string) => {
     if (!confirm("Supprimer ce document ?")) return;
     const maj = docs.filter(d => d.nom !== nom);
@@ -97,7 +90,6 @@ export default function EnseignantPage() {
     setDocOuvert(null);
   };
 
-  // On affiche les chiffres du serveur au début, puis les vrais chiffres après
   const sansReponse = monte ? questions.filter(q => !q.reponse).length : questionsDefaut.filter(q => !q.reponse).length;
   const avecReponse = monte ? questions.filter(q => q.reponse).length : questionsDefaut.filter(q => q.reponse).length;
 
@@ -113,9 +105,7 @@ export default function EnseignantPage() {
             <div><p className="text-2xl font-bold">{avecReponse}</p><p className="text-xs opacity-80">Répondues ✅</p></div>
           </div>
         </div>
-
         <Link href="/enseignant/inscriptions" className="block bg-orange-500 text-white text-center py-4 rounded-2xl mt-4 font-bold">📝 Voir le Tableau des Inscriptions →</Link>
-
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="bg-white rounded-2xl p-6">
             <h2 className="font-bold text-lg">👦🏾 Mes élèves</h2>
@@ -128,11 +118,11 @@ export default function EnseignantPage() {
                 </div>
               ))}
             </div>
-            <h2 className="font-bold text-lg mt-8">📁 Documents partagés - Clique pour ouvrir</h2>
+            <h2 className="font-bold text-lg mt-8">📁 Documents partagés</h2>
             <div className="space-y-3 mt-3">
               {docs.map((d) => (
                 <button key={d.nom} onClick={() => setDocOuvert(d)} className="w-full text-left border rounded-xl p-3 flex justify-between items-center hover:shadow">
-                  <div className="flex gap-3 items-center"><span className="text-2xl">{d.type === "PDF" ? "📄" : "🖼️"}</span><div><p className="font-bold text-sm">{d.nom}</p><p className="text-xs text-gray-500">{d.type} • {d.taille} • {d.date}</p><p className="text-xs text-blue-600 font-bold">Ouvrir la session →</p></div></div>
+                  <div className="flex gap-3 items-center"><span className="text-2xl">{d.type === "PDF" ? "📄" : "🖼️"}</span><div><p className="font-bold text-sm">{d.nom}</p><p className="text-xs text-gray-500">{d.type} • {d.taille} • {d.date}</p></div></div>
                   <span className="text-lg">👁️</span>
                 </button>
               ))}
@@ -142,8 +132,6 @@ export default function EnseignantPage() {
             <div className="bg-white rounded-2xl p-6">
               <h2 className="font-bold text-lg">✏️ Créer une leçon</h2>
               <input value={titre} onChange={(e) => setTitre(e.target.value)} placeholder="Ex: Les nombres de 1 à 100" className="w-full border rounded-xl p-3 mt-4 outline-none" />
-              <select className="w-full border rounded-xl p-3 mt-2"><option>CP - Maths</option><option>CP - Lecture</option><option>CE1 - Français</option><option>CE1 - Maths</option></select>
-              <textarea placeholder="Contenu de la leçon..." rows={3} className="w-full border rounded-xl p-3 mt-2 outline-none" />
               <button onClick={creerLecon} className="w-full bg-purple-700 text-white py-3 rounded-full mt-3 font-bold">Publier la leçon →</button>
             </div>
             <div className="bg-white rounded-2xl p-6 mt-4 border-2 border-dashed border-purple-300">
@@ -153,19 +141,17 @@ export default function EnseignantPage() {
             {message && <p className="mt-3 text-sm font-bold text-green-700 text-center bg-green-50 p-3 rounded-xl">{message}</p>}
           </div>
         </div>
-
         <div className="bg-white rounded-2xl p-6 mt-6">
-          <h2 className="font-bold text-lg">💬 Questions des élèves - Clique pour ouvrir</h2>
+          <h2 className="font-bold text-lg">💬 Questions des élèves</h2>
           <div className="space-y-3 mt-4">
             {questions.map((q) => (
               <div key={q.id} className="border rounded-xl p-4">
                 <button onClick={() => ouvrirSession(q)} className="w-full text-left">
                   <p className="font-bold text-sm">👦 {q.auteur} <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{q.role}</span> <span className="text-xs text-gray-400">• {q.date} • ❤️ {q.likes}</span></p>
                   <p className="text-sm mt-1">{q.question}</p>
-                  <p className="text-xs text-blue-600 font-bold mt-1">Ouvrir la session →</p>
                 </button>
                 {q.reponse ? (
-                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-green-50 border border-green-200 p-3 rounded-lg"><p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse - Clique pour voir / modifier / supprimer :</p><p className="text-sm mt-1">{q.reponse}</p></button>
+                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-green-50 border border-green-200 p-3 rounded-lg"><p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse :</p><p className="text-sm mt-1">{q.reponse}</p></button>
                 ) : (
                   <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-orange-50 p-3 rounded-lg"><p className="text-sm text-orange-600 font-bold">⏳ Pas encore de réponse - Clique pour répondre →</p></button>
                 )}
@@ -183,19 +169,20 @@ export default function EnseignantPage() {
             {ouverteMaj.reponse && (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mt-3">
                 <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse actuelle :</p><p className="mt-1">{ouverteMaj.reponse}</p>
-                <button onClick={supprimerReponse} className="w-full bg-red-100 text-red-700 py-2 rounded-full mt-3 text-sm font-bold">🗑️ Supprimer cette fausse réponse</button>
+                <button onClick={supprimerReponse} className="w-full bg-red-100 text-red-700 py-2 rounded-full mt-3 text-sm font-bold">🗑️ Supprimer cette réponse</button>
               </div>
             )}
             <div className="mt-4"><p className="font-bold text-sm">{ouverteMaj.reponse ? "Corriger la réponse :" : "Écrire ta réponse :"}</p>
+              {/* BOUTON IA */}
+              <button onClick={() => setReponseTxt(proposerReponse(ouverteMaj.question, ouverteMaj.role))} className="w-full bg-purple-100 text-purple-700 py-2 rounded-full font-bold text-sm mb-2">✨ IA - Proposer une réponse</button>
               <textarea value={reponseTxt} onChange={e => setReponseTxt(e.target.value)} rows={3} className="w-full border rounded-xl p-3 mt-2 outline-none" />
               <button onClick={repondreDansSession} className="w-full bg-purple-700 text-white py-3 rounded-full mt-2 font-bold">Envoyer la réponse ✅</button>
             </div>
-            <button onClick={supprimerQuestion} className="w-full bg-gray-100 text-red-600 py-3 rounded-full mt-2 text-sm font-bold">🗑️ Supprimer toute la question (si fausse)</button>
+            <button onClick={supprimerQuestion} className="w-full bg-gray-100 text-red-600 py-3 rounded-full mt-2 text-sm font-bold">🗑️ Supprimer toute la question</button>
             <button onClick={() => setOuverte(null)} className="w-full bg-gray-100 py-3 rounded-full mt-2 text-sm font-bold">Fermer</button>
           </div>
         </div>
       )}
-
       {docOuvert && (
         <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setDocOuvert(null)}>
           <div className="bg-white w-full max-w-lg rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
