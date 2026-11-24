@@ -46,6 +46,7 @@ export default function Accueil() {
             <Link href="#contact">Contact</Link>
             <Link href="/questions">💬 Questions</Link>
             <Link href="/enseignant">👩🏾‍🏫 Enseignant</Link>
+            <Link href="/inscription" className="text-orange-600">📝 Inscription</Link>
           </nav>
           {user ? (
             <div className="flex items-center gap-2">
@@ -65,8 +66,9 @@ export default function Accueil() {
         <p className="text-gray-500 mt-3">Leçons, jeux, exercices et questions-réponses avec Mme Diop.</p>
         <img src="/ecole-senegal.jpeg" alt="Ecole-Senegal Keur Massar" className="w-full max-w-3xl mx-auto rounded-3xl shadow-lg mt-6 object-cover" />
         <div className="flex flex-wrap justify-center gap-3 mt-6">
+          <Link href="/inscription" className="bg-orange-500 text-white px-6 py-3 rounded-full font-bold text-sm">📝 Inscrire mon enfant</Link>
           <Link href="/connexion" className="bg-green-600 text-white px-6 py-3 rounded-full font-bold text-sm">Commencer →</Link>
-          <Link href="/questions" className="bg-white border px-6 py-3 rounded-full font-bold text-sm">💬 Voir les questions</Link>
+          <Link href="#apropos" className="bg-white border px-6 py-3 rounded-full font-bold text-sm">🏫 À propos</Link>
           <a href="https://wa.me/221758376591" target="_blank" className="bg-green-500 text-white px-6 py-3 rounded-full font-bold text-sm">💬 WhatsApp : 75 837 65 91</a>
         </div>
         <div className="flex justify-center gap-8 mt-8 text-sm">
@@ -89,7 +91,13 @@ export default function Accueil() {
             </Link>
           ))}
         </div>
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <Link href="/inscription" className="bg-orange-500 text-white rounded-2xl p-5 text-center">
+            <p className="text-4xl">📝</p>
+            <p className="font-bold mt-2">Inscription</p>
+            <p className="text-xs opacity-80">Inscrire mon enfant</p>
+            <p className="text-sm font-bold mt-2">S'inscrire →</p>
+          </Link>
           <Link href="/questions" className="bg-white rounded-2xl p-5 text-center border">
             <p className="text-4xl">💬</p>
             <p className="font-bold mt-2">Questions / Réponses</p>
@@ -123,6 +131,7 @@ export default function Accueil() {
           </div>
           <p className="text-sm text-gray-500 mt-4">📍 Située à Keur Massar, Dakar - Sénégal. Ouverte à tous les enfants, partout au Sénégal.</p>
           <p className="text-sm font-bold mt-1">📞 +221 75 837 65 91</p>
+          <Link href="/inscription" className="bg-orange-500 text-white px-6 py-3 rounded-full font-bold text-sm inline-block mt-4">📝 Inscrire mon enfant →</Link>
         </div>
       </div>
 
@@ -137,7 +146,7 @@ export default function Accueil() {
               <p className="bg-white/10 rounded-2xl p-4">📍 <b>Adresse :</b><br/>Keur Massar, Dakar, Sénégal</p>
               <p className="bg-white/10 rounded-2xl p-4">📞 <b>Téléphone / WhatsApp :</b><br/>+221 75 837 65 91<br/><a href="https://wa.me/221758376591" target="_blank" className="bg-white text-green-700 px-4 py-2 rounded-full inline-block mt-2 font-bold text-xs">💬 Écrire sur WhatsApp →</a></p>
               <p className="bg-white/10 rounded-2xl p-4">✉️ <b>Email :</b><br/>contact@ecole-senegal.sn</p>
-              <p className="bg-white/10 rounded-2xl p-4">🕐 <b>Horaires :</b><br/>Lundi au Vendredi : 08h - 17h <span className="opacity-80">(avec des pauses)</span><br/>Samedi : 09h - 13h <span className="opacity-80">(avec une pause)</span></p>
+              <p className="bg-white/10 rounded-2xl p-4">🕐 <b>Horaires :</b><br/>Lundi au Vendredi : 08h - 17h<br/><span className="opacity-80">☕ Pauses : 10h - 10h30 et 13h - 14h</span><br/>Samedi : 09h - 13h<br/><span className="opacity-80">☕ Pause : 10h - 10h30</span></p>
             </div>
             <div className="bg-white rounded-2xl p-5 text-black">
               <p className="font-bold">Envoyer un message</p>
