@@ -17,11 +17,14 @@ export default function InscriptionPage() {
       alert("Remplis tous les champs : Parent, Enfant, Âge, Téléphone !");
       return;
     }
-    const nouvelle = { id: Date.now(), parent, enfant, age, sexe, niveau, tel, message, date: "Aujourd'hui", statut: "En attente" };
+    const id = Date.now();
+    const nouvelle = { id, parent, enfant, age, sexe, niveau, tel, message, date: "Aujourd'hui", statut: "En attente" };
     const anciennes = JSON.parse(localStorage.getItem("ecole-inscriptions") || "[]");
     localStorage.setItem("ecole-inscriptions", JSON.stringify([nouvelle, ...anciennes]));
 
-    const texte = `Bonjour Mme Diop, nouvelle inscription:%0A- Parent: ${parent}%0A- Enfant: ${enfant}%0A- Âge: ${age} ans%0A- Sexe: ${sexe}%0A- Niveau: ${niveau}%0A- Tél: ${tel}%0A- Message: ${message}`;
+    // LIEN AVEC TOUTES LES INFOS DEDANS
+    const lien = `https://ecole-senegal.vercel.app/enseignant/inscriptions?valider=${id}&parent=${encodeURIComponent(parent)}&enfant=${encodeURIComponent(enfant)}&age=${age}&sexe=${encodeURIComponent(sexe)}&niveau=${niveau}&tel=${encodeURIComponent(tel)}`;
+    const texte = `Bonjour Mme Diop, nouvelle inscription:%0A- Parent: ${parent}%0A- Enfant: ${enfant}%0A- Âge: ${age} ans%0A- Sexe: ${sexe}%0A- Niveau: ${niveau}%0A- Tél: ${tel}%0A- Message: ${message}%0A%0A👉 CLIQUE ICI POUR VERIFIER ET VALIDER:%0A${lien}%0A%0AAppuie sur OK pour valider.`;
     window.open(`https://wa.me/221773758473?text=${texte}`, "_blank");
     setEnvoye(true);
   };
