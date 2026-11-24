@@ -2,84 +2,59 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const niveaux = ["Moyenne Section", "Grande Section", "CP", "CE1", "CE2", "CM1", "CM2"];
-
-export default function Inscription() {
-  const [nomParent, setNomParent] = useState("");
-  const [nomEnfant, setNomEnfant] = useState("");
+export default function InscriptionPage() {
+  const [parent, setParent] = useState("");
+  const [enfant, setEnfant] = useState("");
+  const [age, setAge] = useState("");
+  const [sexe, setSexe] = useState("Garçon");
   const [niveau, setNiveau] = useState("CP");
-  const [telephone, setTelephone] = useState("");
+  const [tel, setTel] = useState("");
   const [message, setMessage] = useState("");
+  const [envoye, setEnvoye] = useState(false);
 
   const envoyer = () => {
-    if (!nomParent.trim() || !nomEnfant.trim() || !telephone.trim()) {
-      alert("Remplis : ton nom, nom de l'enfant et téléphone !");
+    if (!parent.trim() || !enfant.trim() || !age.trim() || !tel.trim()) {
+      alert("Remplis tous les champs : Parent, Enfant, Âge, Téléphone !");
       return;
     }
-
-    // 1. ENREGISTRER dans le tableau
-    const nouvelle = {
-      parent: nomParent,
-      enfant: nomEnfant,
-      niveau: niveau,
-      telephone: telephone,
-      message: message,
-      date: new Date().toLocaleString("fr-SN"),
-    };
+    const nouvelle = { id: Date.now(), parent, enfant, age, sexe, niveau, tel, message, date: "Aujourd'hui", statut: "En attente" };
     const anciennes = JSON.parse(localStorage.getItem("ecole-inscriptions") || "[]");
-    anciennes.push(nouvelle);
-    localStorage.setItem("ecole-inscriptions", JSON.stringify(anciennes));
+    localStorage.setItem("ecole-inscriptions", JSON.stringify([nouvelle, ...anciennes]));
 
-    // 2. Envoyer aussi sur WhatsApp
-    const texte = encodeURIComponent(`📝 NOUVELLE INSCRIPTION - Ecole-Senegal\n\n👤 Parent : ${nomParent}\n👧 Enfant : ${nomEnfant}\n📚 Niveau : ${niveau}\n📞 Tél parent : ${telephone}\n💬 Message : ${message || "Aucun"}\n\nMerci !`);
-    window.open(`https://wa.me/221758376591?text=${texte}`, "_blank");
+    const texte = `Bonjour Mme Diop, nouvelle inscription:%0A- Parent: ${parent}%0A- Enfant: ${enfant}%0A- Âge: ${age} ans%0A- Sexe: ${sexe}%0A- Niveau: ${niveau}%0A- Tél: ${tel}%0A- Message: ${message}`;
+    window.open(`https://wa.me/221773758473?text=${texte}`, "_blank");
+    setEnvoye(true);
   };
 
+  if (envoye) return (
+    <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center p-6 text-center">
+      <div className="bg-white rounded-3xl p-8 max-w-md w-full">
+        <p className="text-5xl">✅</p><h1 className="text-xl font-bold mt-3">Merci {parent} !</h1>
+        <p className="text-sm text-gray-500 mt-2">Inscription de {enfant} ({age} ans, {sexe}, {niveau}) envoyée.<br/>Mme Diop va te répondre sur WhatsApp.</p>
+        <Link href="/" className="block bg-black text-white py-3 rounded-full mt-6 font-bold text-sm">Retour à l&apos;accueil</Link>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#f8f7f4]">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="bg-green-600 text-white w-9 h-9 rounded-full flex items-center justify-center font-bold">E</span>
-            <span className="font-bold">Ecole-Senegal</span>
-          </Link>
-          <Link href="/" className="bg-gray-100 px-4 py-2 rounded-full text-sm font-bold">← Retour Accueil</Link>
-        </div>
-      </header>
-
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="text-center">
-          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">🇸🇳 Keur Massar • 100% Gratuit</span>
-          <h1 className="text-3xl md:text-4xl font-bold mt-4">📝 Inscrire mon enfant</h1>
-          <p className="text-gray-500 mt-2">Remplis le formulaire, ça part directement sur notre WhatsApp <b>+221 75 837 65 91</b>. On te répond très vite !</p>
-          <img src="/ecole-senegal.jpeg" alt="Ecole-Senegal" className="w-full rounded-3xl mt-4 object-cover max-h-56" />
-        </div>
-
-        <div className="bg-white rounded-3xl p-6 mt-6 shadow">
-          <label className="font-bold text-sm">Nom du parent *</label>
-          <input value={nomParent} onChange={e => setNomParent(e.target.value)} placeholder="Ex: Awa Diop" className="w-full border rounded-xl p-3 mt-1 mb-4 text-sm outline-none" />
-
-          <label className="font-bold text-sm">Nom de l'enfant *</label>
-          <input value={nomEnfant} onChange={e => setNomEnfant(e.target.value)} placeholder="Ex: Moussa Diop" className="w-full border rounded-xl p-3 mt-1 mb-4 text-sm outline-none" />
-
-          <label className="font-bold text-sm">Niveau souhaité *</label>
-          <select value={niveau} onChange={e => setNiveau(e.target.value)} className="w-full border rounded-xl p-3 mt-1 mb-4 text-sm outline-none bg-white">
-            {niveaux.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-
-          <label className="font-bold text-sm">Téléphone du parent *</label>
-          <input value={telephone} onChange={e => setTelephone(e.target.value)} placeholder="Ex: 77 123 45 67" className="w-full border rounded-xl p-3 mt-1 mb-4 text-sm outline-none" />
-
-          <label className="font-bold text-sm">Message (optionnel)</label>
-          <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Ex: Mon enfant veut commencer lundi..." rows={3} className="w-full border rounded-xl p-3 mt-1 text-sm outline-none" />
-
-          <button onClick={envoyer} className="w-full bg-green-600 text-white py-4 rounded-full mt-5 font-bold">📩 Envoyer l'inscription sur WhatsApp →</button>
-          <p className="text-center text-xs text-gray-400 mt-3">Horaires : Lun-Ven 08h-17h (Pauses 10h-10h30 et 13h-14h) • Sam 09h-13h (Pause 10h-10h30)</p>
-        </div>
-
-        <div className="bg-green-600 text-white rounded-3xl p-5 mt-4 text-center">
-          <p className="font-bold">Tu préfères appeler ?</p>
-          <a href="https://wa.me/221758376591" target="_blank" className="bg-white text-green-700 px-5 py-2 rounded-full inline-block mt-2 font-bold text-sm">💬 WhatsApp : 75 837 65 91</a>
+    <div className="min-h-screen bg-[#f8f7f4] p-6">
+      <Link href="/" className="text-sm">← Retour</Link>
+      <div className="max-w-md mx-auto bg-white rounded-3xl p-6 mt-4">
+        <h1 className="text-2xl font-bold">📝 Inscrire mon enfant</h1>
+        <p className="text-sm text-gray-500">École de Yeumbeul • Dakar</p>
+        <div className="space-y-3 mt-5">
+          <input value={parent} onChange={e => setParent(e.target.value)} placeholder="Nom du parent - Ex: Moussa seck" className="w-full border rounded-xl p-3" />
+          <input value={enfant} onChange={e => setEnfant(e.target.value)} placeholder="Nom de l'enfant - Ex: Lamine seck" className="w-full border rounded-xl p-3" />
+          <div className="flex gap-2">
+            <input value={age} onChange={e => setAge(e.target.value)} placeholder="Âge - Ex: 6" type="number" className="flex-1 border rounded-xl p-3" />
+            <select value={sexe} onChange={e => setSexe(e.target.value)} className="flex-1 border rounded-xl p-3">
+              <option>Garçon</option><option>Fille</option>
+            </select>
+          </div>
+          <select value={niveau} onChange={e => setNiveau(e.target.value)} className="w-full border rounded-xl p-3"><option>CP</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option></select>
+          <input value={tel} onChange={e => setTel(e.target.value)} placeholder="Téléphone WhatsApp - Ex: 76 376 82 40" className="w-full border rounded-xl p-3" />
+          <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Message pour Mme Diop (optionnel)" rows={2} className="w-full border rounded-xl p-3" />
+          <button onClick={envoyer} className="w-full bg-green-600 text-white py-4 rounded-full font-bold">Envoyer sur WhatsApp →</button>
         </div>
       </div>
     </div>

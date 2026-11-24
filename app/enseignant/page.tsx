@@ -28,26 +28,30 @@ export default function EnseignantPage() {
   const [eleves] = useState(elevesInit);
   const [titre, setTitre] = useState("");
   const [message, setMessage] = useState("");
-  const [docs, setDocs] = useState<Doc[]>(() => {
-    if (typeof window === "undefined") return docsDefaut;
-    const d = localStorage.getItem("ecole-docs");
-    return d ? JSON.parse(d) : docsDefaut;
-  });
-
-  const [questions, setQuestions] = useState<Q[]>(() => {
-    if (typeof window === "undefined") return questionsDefaut;
-    const s = localStorage.getItem("ecole-questions");
-    return s ? JSON.parse(s) : questionsDefaut;
-  });
+  const [docs, setDocs] = useState<Doc[]>(docsDefaut);
+  const [questions, setQuestions] = useState<Q[]>(questionsDefaut);
   const [ouverte, setOuverte] = useState<Q | null>(null);
   const [docOuvert, setDocOuvert] = useState<Doc | null>(null);
   const [reponseTxt, setReponseTxt] = useState("");
+  const [monte, setMonte] = useState(false);
 
+  // 1. Charger APRES affichage, comme le serveur
   useEffect(() => {
-    if (questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
-  }, [questions]);
+    setMonte(true);
+    try {
+      const s = localStorage.getItem("ecole-questions");
+      if (s) setQuestions(JSON.parse(s));
+      const d = localStorage.getItem("ecole-docs");
+      if (d) setDocs(JSON.parse(d));
+    } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, []);
 
-  // Question ouverte toujours à jour, sans setState dans useEffect
+  // 2. Sauvegarder seulement après le chargement
+  useEffect(() => {
+    if (monte && questions.length > 0) localStorage.setItem("ecole-questions", JSON.stringify(questions));
+  }, [questions, monte]);
+
   const ouverteMaj = ouverte ? questions.find(q => q.id === ouverte.id) || ouverte : null;
 
   const ouvrirSession = (q: Q) => { setOuverte(q); setReponseTxt(q.reponse || ""); };
@@ -60,10 +64,9 @@ export default function EnseignantPage() {
 
   const supprimerReponse = () => {
     if (!ouverteMaj) return;
-    if (!confirm("Supprimer cette réponse ? L’élève verra à nouveau 'En attente...'")) return;
+    if (!confirm("Supprimer cette réponse ?")) return;
     setQuestions(questions.map(q => q.id === ouverteMaj.id ? { ...q, reponse: null } : q));
     setOuverte(null);
-    alert("🗑️ Réponse supprimée ! Tu peux écrire une nouvelle réponse.");
   };
 
   const supprimerQuestion = () => {
@@ -94,8 +97,9 @@ export default function EnseignantPage() {
     setDocOuvert(null);
   };
 
-  const sansReponse = questions.filter(q => !q.reponse).length;
-  const avecReponse = questions.filter(q => q.reponse).length;
+  // On affiche les chiffres du serveur au début, puis les vrais chiffres après
+  const sansReponse = monte ? questions.filter(q => !q.reponse).length : questionsDefaut.filter(q => !q.reponse).length;
+  const avecReponse = monte ? questions.filter(q => q.reponse).length : questionsDefaut.filter(q => q.reponse).length;
 
   return (
     <div className="min-h-screen bg-[#f8f7f4] p-6">
@@ -103,7 +107,7 @@ export default function EnseignantPage() {
       <div className="max-w-5xl mx-auto mt-4">
         <div className="bg-purple-700 text-white rounded-3xl p-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div><h1 className="text-2xl font-bold">Bonjour, Mme Diop 👩🏾‍🏫</h1><p className="opacity-80 text-sm">École de Yeumbeul • Dakar • Classe CP / CE1</p></div>
-          <div className="flex gap-6 text-center">
+          <div className="flex gap-6 text-center" suppressHydrationWarning>
             <div><p className="text-2xl font-bold">{eleves.length}</p><p className="text-xs opacity-80">Élèves</p></div>
             <div><p className="text-2xl font-bold">{sansReponse}</p><p className="text-xs opacity-80">À répondre ⏳</p></div>
             <div><p className="text-2xl font-bold">{avecReponse}</p><p className="text-xs opacity-80">Répondues ✅</p></div>
@@ -124,7 +128,6 @@ export default function EnseignantPage() {
                 </div>
               ))}
             </div>
-
             <h2 className="font-bold text-lg mt-8">📁 Documents partagés - Clique pour ouvrir</h2>
             <div className="space-y-3 mt-3">
               {docs.map((d) => (
@@ -135,7 +138,6 @@ export default function EnseignantPage() {
               ))}
             </div>
           </div>
-
           <div>
             <div className="bg-white rounded-2xl p-6">
               <h2 className="font-bold text-lg">✏️ Créer une leçon</h2>
@@ -163,10 +165,7 @@ export default function EnseignantPage() {
                   <p className="text-xs text-blue-600 font-bold mt-1">Ouvrir la session →</p>
                 </button>
                 {q.reponse ? (
-                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-green-50 border border-green-200 p-3 rounded-lg">
-                    <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse - Clique pour voir / modifier / supprimer :</p>
-                    <p className="text-sm mt-1">{q.reponse}</p>
-                  </button>
+                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-green-50 border border-green-200 p-3 rounded-lg"><p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse - Clique pour voir / modifier / supprimer :</p><p className="text-sm mt-1">{q.reponse}</p></button>
                 ) : (
                   <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-orange-50 p-3 rounded-lg"><p className="text-sm text-orange-600 font-bold">⏳ Pas encore de réponse - Clique pour répondre →</p></button>
                 )}
