@@ -44,7 +44,6 @@ export default function EnseignantPage() {
       const d = localStorage.getItem("ecole-docs");
       if (d) setDocs(JSON.parse(d));
     } catch {}
-    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
   useEffect(() => {
@@ -94,66 +93,80 @@ export default function EnseignantPage() {
   const avecReponse = monte ? questions.filter(q => q.reponse).length : questionsDefaut.filter(q => q.reponse).length;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] p-6">
-      <Link href="/" className="text-sm">← Retour</Link>
+    <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-white p-4 md:p-6">
+      <Link href="/" className="text-sm font-bold">← Retour Accueil</Link>
       <div className="max-w-5xl mx-auto mt-4">
-        <div className="bg-purple-700 text-white rounded-3xl p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div><h1 className="text-2xl font-bold">Bonjour, Mme Diop 👩🏾‍🏫</h1><p className="opacity-80 text-sm">École de Yeumbeul • Dakar • Classe CP / CE1</p></div>
-          <div className="flex gap-6 text-center" suppressHydrationWarning>
-            <div><p className="text-2xl font-bold">{eleves.length}</p><p className="text-xs opacity-80">Élèves</p></div>
-            <div><p className="text-2xl font-bold">{sansReponse}</p><p className="text-xs opacity-80">À répondre ⏳</p></div>
-            <div><p className="text-2xl font-bold">{avecReponse}</p><p className="text-xs opacity-80">Répondues ✅</p></div>
+        {/* NOUVEAU HEADER VIOLET DÉGRADÉ */}
+        <div className="bg-gradient-to-br from-violet-700 via-purple-600 to-fuchsia-500 text-white rounded-[2rem] p-6 md:p-8 shadow-xl shadow-violet-600/20">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-6">
+            <div className="flex items-center gap-4">
+              <span className="bg-white/20 backdrop-blur w-16 h-16 rounded-3xl flex items-center justify-center text-3xl shadow">👩🏾‍🏫</span>
+              <div><h1 className="text-2xl md:text-3xl font-black tracking-tight">Bonjour, Mme Diop</h1><p className="opacity-80 text-sm">École de Yeumbeul • Dakar • Classe CP / CE1 • 75 837 65 91</p></div>
+            </div>
+            <div className="flex gap-3 text-center">
+              <div className="bg-white/15 backdrop-blur rounded-2xl px-4 py-3 min-w-[72px]"><p className="text-2xl font-black">{eleves.length}</p><p className="text-[11px] opacity-80">Élèves</p></div>
+              <div className="bg-orange-500 rounded-2xl px-4 py-3 min-w-[72px] shadow-lg shadow-orange-500/30"><p className="text-2xl font-black">{sansReponse}</p><p className="text-[11px] opacity-90">À répondre ⏳</p></div>
+              <div className="bg-white/15 backdrop-blur rounded-2xl px-4 py-3 min-w-[72px]"><p className="text-2xl font-black">{avecReponse}</p><p className="text-[11px] opacity-80">Répondues ✅</p></div>
+            </div>
           </div>
         </div>
-        <Link href="/enseignant/inscriptions" className="block bg-orange-500 text-white text-center py-4 rounded-2xl mt-4 font-bold">📝 Voir le Tableau des Inscriptions →</Link>
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <div className="bg-white rounded-2xl p-6">
-            <h2 className="font-bold text-lg">👦🏾 Mes élèves</h2>
-            <div className="space-y-4 mt-4">
+
+        <Link href="/enseignant/inscriptions" className="block bg-gradient-to-r from-orange-500 to-amber-500 text-white text-center py-4 rounded-full mt-4 font-bold shadow-lg shadow-orange-500/30 active:scale-[0.98] transition">📝 Voir le Tableau des Inscriptions →</Link>
+
+        <div className="grid md:grid-cols-2 gap-4 mt-5">
+          {/* ÉLÈVES + DOCS */}
+          <div className="bg-white rounded-[1.8rem] p-6 shadow-sm border border-gray-100">
+            <h2 className="font-black text-lg">👦🏾 Mes élèves</h2>
+            <div className="space-y-3 mt-4">
               {eleves.map((e) => (
-                <div key={e.nom} className="border rounded-xl p-4">
-                  <div className="flex justify-between"><p className="font-bold text-sm">{e.nom}</p><span className="text-xs bg-gray-100 px-2 py-1 rounded-full">{e.niveau}</span></div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1"><span>⭐ {e.points} points • {e.derniere}</span><span>{e.progression}%</span></div>
-                  <div className="w-full bg-gray-200 h-2 rounded-full mt-2"><div className="bg-purple-600 h-2 rounded-full" style={{ width: `${e.progression}%` }}></div></div>
+                <div key={e.nom} className="bg-gray-50 hover:bg-violet-50 transition rounded-2xl p-4">
+                  <div className="flex justify-between items-center"><p className="font-bold text-sm">{e.nom}</p><span className="text-xs bg-white px-2.5 py-1 rounded-full font-bold shadow-sm">{e.niveau}</span></div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1.5"><span>⭐ {e.points} points • {e.derniere}</span><span className="font-bold text-violet-700">{e.progression}%</span></div>
+                  <div className="w-full bg-gray-200 h-2.5 rounded-full mt-2 overflow-hidden"><div className="bg-gradient-to-r from-violet-600 to-fuchsia-500 h-2.5 rounded-full" style={{ width: `${e.progression}%` }}></div></div>
                 </div>
               ))}
             </div>
-            <h2 className="font-bold text-lg mt-8">📁 Documents partagés</h2>
-            <div className="space-y-3 mt-3">
+            <h2 className="font-black text-lg mt-8">📁 Documents partagés</h2>
+            <div className="space-y-2.5 mt-3">
               {docs.map((d) => (
-                <button key={d.nom} onClick={() => setDocOuvert(d)} className="w-full text-left border rounded-xl p-3 flex justify-between items-center hover:shadow">
-                  <div className="flex gap-3 items-center"><span className="text-2xl">{d.type === "PDF" ? "📄" : "🖼️"}</span><div><p className="font-bold text-sm">{d.nom}</p><p className="text-xs text-gray-500">{d.type} • {d.taille} • {d.date}</p></div></div>
+                <button key={d.nom} onClick={() => setDocOuvert(d)} className="w-full text-left bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 hover:shadow rounded-2xl p-3.5 flex justify-between items-center transition">
+                  <div className="flex gap-3 items-center"><span className="bg-white w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-sm">{d.type === "PDF" ? "📄" : "🖼️"}</span><div><p className="font-bold text-sm">{d.nom}</p><p className="text-xs text-gray-500">{d.type} • {d.taille} • {d.date}</p></div></div>
                   <span className="text-lg">👁️</span>
                 </button>
               ))}
             </div>
           </div>
+
+          {/* CRÉER + PARTAGER */}
           <div>
-            <div className="bg-white rounded-2xl p-6">
-              <h2 className="font-bold text-lg">✏️ Créer une leçon</h2>
-              <input value={titre} onChange={(e) => setTitre(e.target.value)} placeholder="Ex: Les nombres de 1 à 100" className="w-full border rounded-xl p-3 mt-4 outline-none" />
-              <button onClick={creerLecon} className="w-full bg-purple-700 text-white py-3 rounded-full mt-3 font-bold">Publier la leçon →</button>
+            <div className="bg-white rounded-[1.8rem] p-6 shadow-sm border border-gray-100">
+              <h2 className="font-black text-lg">✏️ Créer une leçon</h2>
+              <input value={titre} onChange={(e) => setTitre(e.target.value)} placeholder="Ex: Les nombres de 1 à 100" className="w-full border rounded-2xl p-3.5 mt-4 outline-none bg-gray-50 focus:bg-white focus:border-violet-500" />
+              <button onClick={creerLecon} className="w-full bg-violet-600 text-white py-3.5 rounded-full mt-3 font-bold shadow-lg shadow-violet-600/30 active:scale-[0.98] transition">Publier la leçon →</button>
             </div>
-            <div className="bg-white rounded-2xl p-6 mt-4 border-2 border-dashed border-purple-300">
-              <h2 className="font-bold text-lg">📤 Partager un document</h2>
-              <label className="block text-center bg-purple-100 cursor-pointer py-6 rounded-xl mt-4 font-bold text-purple-700">📁 Choisir un fichier<input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" onChange={ajouterDoc} className="hidden" /></label>
+            <div className="bg-violet-50 rounded-[1.8rem] p-6 mt-4 border-2 border-dashed border-violet-300">
+              <h2 className="font-black text-lg">📤 Partager un document</h2>
+              <label className="block text-center bg-white cursor-pointer py-7 rounded-2xl mt-4 font-bold text-violet-700 shadow-sm">📁 Choisir un fichier<input type="file" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" onChange={ajouterDoc} className="hidden" /></label>
+              <p className="text-center text-xs text-violet-500 mt-2">PDF, Word, Images</p>
             </div>
-            {message && <p className="mt-3 text-sm font-bold text-green-700 text-center bg-green-50 p-3 rounded-xl">{message}</p>}
+            {message && <p className="mt-3 text-sm font-bold text-green-700 text-center bg-green-50 p-3.5 rounded-2xl border border-green-100">{message}</p>}
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-6 mt-6">
-          <h2 className="font-bold text-lg">💬 Questions des élèves</h2>
+
+        {/* QUESTIONS */}
+        <div className="bg-white rounded-[1.8rem] p-6 mt-4 shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center"><h2 className="font-black text-lg">💬 Questions des élèves</h2><span className="text-xs font-bold bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full">{sansReponse} en attente</span></div>
           <div className="space-y-3 mt-4">
             {questions.map((q) => (
-              <div key={q.id} className="border rounded-xl p-4">
+              <div key={q.id} className="bg-gray-50 rounded-2xl p-4">
                 <button onClick={() => ouvrirSession(q)} className="w-full text-left">
-                  <p className="font-bold text-sm">👦 {q.auteur} <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{q.role}</span> <span className="text-xs text-gray-400">• {q.date} • ❤️ {q.likes}</span></p>
-                  <p className="text-sm mt-1">{q.question}</p>
+                  <p className="font-bold text-sm">👦 {q.auteur} <span className="text-xs bg-white px-2 py-1 rounded-full shadow-sm">{q.role}</span> <span className="text-xs text-gray-400">• {q.date} • ❤️ {q.likes}</span></p>
+                  <p className="text-sm mt-1.5">{q.question}</p>
                 </button>
                 {q.reponse ? (
-                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-green-50 border border-green-200 p-3 rounded-lg"><p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse :</p><p className="text-sm mt-1">{q.reponse}</p></button>
+                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2.5 bg-green-50 border border-green-200 p-3.5 rounded-2xl"><p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse :</p><p className="text-sm mt-1">{q.reponse}</p></button>
                 ) : (
-                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2 bg-orange-50 p-3 rounded-lg"><p className="text-sm text-orange-600 font-bold">⏳ Pas encore de réponse - Clique pour répondre →</p></button>
+                  <button onClick={() => ouvrirSession(q)} className="w-full text-left mt-2.5 bg-orange-50 border border-orange-100 p-3.5 rounded-2xl"><p className="text-sm text-orange-600 font-bold">⏳ Pas encore de réponse - Clique pour répondre →</p></button>
                 )}
               </div>
             ))}
@@ -162,21 +175,20 @@ export default function EnseignantPage() {
       </div>
 
       {ouverteMaj && (
-        <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setOuverte(null)}>
-          <div className="bg-white w-full max-w-lg rounded-3xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center"><p className="font-bold">💬 Session - {ouverteMaj.auteur}</p><button onClick={() => setOuverte(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-4" onClick={() => setOuverte(null)}>
+          <div className="bg-white w-full max-w-lg rounded-[1.8rem] p-6 max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center"><p className="font-black">💬 Session - {ouverteMaj.auteur}</p><button onClick={() => setOuverte(null)} className="bg-gray-100 w-9 h-9 rounded-full font-bold">✕</button></div>
             <div className="bg-blue-50 rounded-2xl p-4 mt-4"><p className="text-xs font-bold text-blue-700">👦 {ouverteMaj.auteur} • {ouverteMaj.date} • ❤️ {ouverteMaj.likes}</p><p className="font-medium mt-1">{ouverteMaj.question}</p></div>
             {ouverteMaj.reponse && (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mt-3">
                 <p className="text-xs font-bold text-green-700">👩🏾‍🏫 Ta réponse actuelle :</p><p className="mt-1">{ouverteMaj.reponse}</p>
-                <button onClick={supprimerReponse} className="w-full bg-red-100 text-red-700 py-2 rounded-full mt-3 text-sm font-bold">🗑️ Supprimer cette réponse</button>
+                <button onClick={supprimerReponse} className="w-full bg-red-100 text-red-700 py-2.5 rounded-full mt-3 text-sm font-bold">🗑️ Supprimer cette réponse</button>
               </div>
             )}
             <div className="mt-4"><p className="font-bold text-sm">{ouverteMaj.reponse ? "Corriger la réponse :" : "Écrire ta réponse :"}</p>
-              {/* BOUTON IA */}
-              <button onClick={() => setReponseTxt(proposerReponse(ouverteMaj.question, ouverteMaj.role))} className="w-full bg-purple-100 text-purple-700 py-2 rounded-full font-bold text-sm mb-2">✨ IA - Proposer une réponse</button>
-              <textarea value={reponseTxt} onChange={e => setReponseTxt(e.target.value)} rows={3} className="w-full border rounded-xl p-3 mt-2 outline-none" />
-              <button onClick={repondreDansSession} className="w-full bg-purple-700 text-white py-3 rounded-full mt-2 font-bold">Envoyer la réponse ✅</button>
+              <button onClick={() => setReponseTxt(proposerReponse(ouverteMaj.question, ouverteMaj.role))} className="w-full bg-violet-100 text-violet-700 py-3 rounded-full font-bold text-sm mb-2 mt-2">✨ IA - Proposer une réponse</button>
+              <textarea value={reponseTxt} onChange={e => setReponseTxt(e.target.value)} rows={3} className="w-full border rounded-2xl p-3.5 mt-1 outline-none bg-gray-50 focus:bg-white" />
+              <button onClick={repondreDansSession} className="w-full bg-violet-600 text-white py-3.5 rounded-full mt-2 font-bold shadow-lg shadow-violet-600/30">Envoyer la réponse ✅</button>
             </div>
             <button onClick={supprimerQuestion} className="w-full bg-gray-100 text-red-600 py-3 rounded-full mt-2 text-sm font-bold">🗑️ Supprimer toute la question</button>
             <button onClick={() => setOuverte(null)} className="w-full bg-gray-100 py-3 rounded-full mt-2 text-sm font-bold">Fermer</button>
@@ -184,12 +196,12 @@ export default function EnseignantPage() {
         </div>
       )}
       {docOuvert && (
-        <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4" onClick={() => setDocOuvert(null)}>
-          <div className="bg-white w-full max-w-lg rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center"><p className="font-bold">📁 Session Document</p><button onClick={() => setDocOuvert(null)} className="bg-gray-100 w-8 h-8 rounded-full">✕</button></div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-4" onClick={() => setDocOuvert(null)}>
+          <div className="bg-white w-full max-w-lg rounded-[1.8rem] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center"><p className="font-black">📁 Document</p><button onClick={() => setDocOuvert(null)} className="bg-gray-100 w-9 h-9 rounded-full font-bold">✕</button></div>
             <div className="text-center mt-4"><p className="text-6xl">{docOuvert.type === "PDF" ? "📄" : "🖼️"}</p><p className="font-bold mt-3">{docOuvert.nom}</p><p className="text-sm text-gray-500">{docOuvert.type} • {docOuvert.taille} • {docOuvert.date}</p></div>
-            {docOuvert.url !== "#" && docOuvert.type.includes("Image") && <img src={docOuvert.url} alt={docOuvert.nom} className="w-full rounded-xl mt-4 max-h-64 object-cover" />}
-            <a href={docOuvert.url} download={docOuvert.nom} target="_blank" className="block text-center bg-black text-white py-3 rounded-full mt-4 font-bold text-sm">⬇️ Télécharger / Ouvrir</a>
+            {docOuvert.url !== "#" && docOuvert.type.includes("Image") && <img src={docOuvert.url} alt={docOuvert.nom} className="w-full rounded-2xl mt-4 max-h-64 object-cover" />}
+            <a href={docOuvert.url} download={docOuvert.nom} target="_blank" className="block text-center bg-black text-white py-3.5 rounded-full mt-4 font-bold text-sm">⬇️ Télécharger / Ouvrir</a>
             <button onClick={() => supprimerDoc(docOuvert.nom)} className="w-full bg-red-100 text-red-700 py-3 rounded-full mt-2 font-bold text-sm">🗑️ Supprimer ce document</button>
             <button onClick={() => setDocOuvert(null)} className="w-full bg-gray-100 py-3 rounded-full mt-2 text-sm font-bold">Fermer</button>
           </div>
